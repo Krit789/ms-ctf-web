@@ -23,7 +23,7 @@ model Users {
 }
 
 model Questions {
-  question_id          Int           @id
+  question_id          Int           @id @default(autoincrement())
   question_title       String
   question_description String
   points               Int
@@ -34,7 +34,7 @@ model Questions {
 }
 
 model Answers {
-  answer_id      Int       @id
+  answer_id      Int       @id @default(autoincrement())
   question_id    Int
   question       Questions @relation(fields: [question_id], references: [question_id])
   student_id     Users?    @relation(fields: [for_student_id], references: [student_id])
@@ -43,15 +43,15 @@ model Answers {
 }
 
 model Submissions {
-  submission_id Int       @id
-  student       Users     @relation(fields: [student_id], references: [student_id])
-  question      Questions @relation(fields: [question_id], references: [question_id])
-  question_id   Int
-  student_id    Int
-  flag          String
-  correct       Boolean
-  firstblood    Boolean
-  created_on    DateTime  @default(now())
+  submission_id    Int       @id @default(autoincrement())
+  student          Users     @relation(fields: [student_id], references: [student_id])
+  question         Questions @relation(fields: [question_id], references: [question_id])
+  question_id      Int
+  student_id       Int
+  flag             String
+  correct          Boolean
+  submission_order Int
+  created_on       DateTime  @default(now())
 }
 
 enum Role {

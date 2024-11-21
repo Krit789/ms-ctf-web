@@ -1,5 +1,5 @@
 import { authenticate } from "ldap-authentication";
-import jwt from "jsonwebtoken" ;
+import jwt from "jsonwebtoken";
 import prisma from "~/lib/prisma";
 
 const config = useRuntimeConfig();
@@ -28,6 +28,11 @@ export default defineEventHandler(async (event) => {
       where: {
         student_id: stu_id,
       },
+      select: {
+        student_id: true,
+        role: true,
+        password: true,
+      }
     });
 
     if (!user || !password) {
@@ -58,7 +63,11 @@ export default defineEventHandler(async (event) => {
         return { message: "Username or password is incorrect" };
       }
     }
-    const token = jwt.sign({ u_id: user.student_id, u_role: user.role }, config.jwt_secret)
+    const token = jwt.sign(
+      { u_id: user.student_id, u_role: user.role },
+      config.jwt_secret,
+      { expiresIn: "1d" }
+    );
     return { message: "Login success", access_token: token };
   } else {
     return { message: "User doesn't exist" };
