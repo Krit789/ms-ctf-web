@@ -11,27 +11,37 @@ datasource db {
 }
 
 model Users {
-  student_id Int          @id
-  email      String       @unique
+  student_id Int           @id
+  email      String        @unique
   password   String?
   firstname  String
   lastname   String
-  created_on DateTime     @default(now())
+  created_on DateTime      @default(now())
   Submission Submissions[]
+  Answers    Answers[]
 }
 
 model Questions {
-  question_id          Int      @id
+  question_id          Int       @id
   question_title       String
   question_description String
-  answer               String
   points               Int
-  created_on           DateTime @default(now())
+  created_on           DateTime  @default(now())
+  Answers              Answers[]
+}
+
+model Answers {
+  answer_id      Int       @id
+  question_id    Int
+  question       Questions @relation(fields: [question_id], references: [question_id])
+  student_id     Users     @relation(fields: [for_student_id], references: [student_id])
+  for_student_id Int
+  answer         String
 }
 
 model Submissions {
   submission_id Int      @id
-  student       Users     @relation(fields: [student_id], references: [student_id])
+  student       Users    @relation(fields: [student_id], references: [student_id])
   student_id    Int
   flag          String
   correct       Boolean
