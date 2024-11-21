@@ -12,7 +12,7 @@ import {
 
 const studentId = ref('65070111')
 
-const question = ref(1)
+const question = ref("1")
 const flag = ref('')
 
 const flagValid = computed(() => !!flag.value)

@@ -15,6 +15,16 @@ export default defineNuxtConfig({
     componentDir: './components/ui'
   },
   css: ['~/assets/css/base.css'],
+  prisma: {
+    installStudio: false,
+  },
+  runtimeConfig: {
+    ldap_server: process.env.LDAP_SERVER || '',
+    ldap_bind: process.env.LDAP_BIND || '',
+    ldap_password: process.env.LDAP_PASSWORD || '',
+    jwt_secret: process.env.JWT_SECRET || 'supersecret12347$#%8123984712893adslnm',
+    ldap_user_search_base: process.env.LDAP_USER_SEARCH_BASE || '',
+  },
   nitro: {
     experimental: {
       websocket: true
