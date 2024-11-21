@@ -13,6 +13,7 @@ datasource db {
 model Users {
   student_id Int           @id
   email      String        @unique
+  role       Role          @default(STUDENT) 
   password   String?
   firstname  String
   lastname   String
@@ -47,4 +48,11 @@ model Submissions {
   correct       Boolean
   firstblood    Boolean
   created_on    DateTime @default(now())
+}
+
+
+enum Role {
+  STUDENT
+  VIEWER
+  ADMIN
 }
