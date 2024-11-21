@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-const count = ref(0)
+
 </script>
 
-<template></template>
+<template>
+  <ul>
+    <li>
+      <NuxtLink class="underline" to="/submit">Submit Flag</NuxtLink>
+    </li>
+    <li>
+      <NuxtLink class="underline" to="/leaderboard">Leaderboard</NuxtLink>
+    </li>
+  </ul>
+</template>
