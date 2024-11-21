@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     message: "success",
-    mappedUsers: sorted.map((user) => {
+    rankings: sorted.map((user) => {
       return {
         student_id: user.student_id,
         firstname: user.firstname,
