@@ -70,6 +70,7 @@ export default defineEventHandler(async (event) => {
     );
     return { message: "Login success", access_token: token };
   } else {
+    setResponseStatus(event, 400);
     return { message: "User doesn't exist" };
   }
 });

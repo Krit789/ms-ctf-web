@@ -1,22 +1,25 @@
 import { useUserState } from "~/composables/states"
 import type { User } from "~/composables/states"
 
-interface GetMeResponse {
+export interface GetMeResponse {
   message: string,
   user: User
 }
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   
   const userState = useUserState()
   const access_token = useCookie('access_token')
   if (!userState.value && access_token.value) {
-    const { data: userdata } = useFetch<GetMeResponse>('/api/auth/me', {
+    await $fetch<GetMeResponse>('/api/auth/me', {
       headers: {
         Authorization: `Bearer ${access_token.value}`
       }
+    }).then((userdata) => {
+      userState.value = userdata.user
+    }).catch((err) => {
+      console.error(err)
     })
-    userState.value = userdata.value?.user || null
   }
 
   const excludedRoutes = ['/login', '/']

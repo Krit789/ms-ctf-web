@@ -1,7 +1,15 @@
 import prisma from "~/lib/prisma";
 
-
 export default defineEventHandler(async (event) => {
+  // Get student_id from context
+  const student_id = event.context.user_id;
+  if (!student_id) {
+    throw createError({
+      statusCode: 400,
+      message: "Unauthorized",
+    });
+  }
+
   const users = await prisma.users.findMany({
     select: {
       student_id: true,
@@ -66,15 +74,20 @@ export default defineEventHandler(async (event) => {
       : b.totalPoints - a.totalPoints
   );
 
+  // Find user's rank and data
+  const userIndex = sorted.findIndex(user => user.student_id === student_id);
+  if (userIndex === -1) {
+    throw createError({
+      statusCode: 404,
+      message: "User not found",
+    });
+  }
+
   return {
     message: "success",
-    rankings: sorted.map((user) => {
-      return {
-        student_id: user.student_id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        totalPoints: user.totalPoints,
-      };
-    }),
+    data: {
+      rank: userIndex + 1,
+      ...sorted[userIndex]
+    }
   };
 });

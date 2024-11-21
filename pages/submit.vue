@@ -1,65 +1,95 @@
 <script lang="ts" setup>
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 
-const studentId = ref('65070111')
+const tokenCookie = useCookie('access_token')
+const currentRank = ref(0)
+const currentScore = ref(0)
 
 const question = ref("1")
 const flag = ref('')
 
-const flagValid = computed(() => !!flag.value)
 
-onMounted(() => {
-  const localStudentId = localStorage.getItem('studentId')
-  if (localStudentId) {
-    studentId.value = localStudentId
-  }
+const questions = ref()
+
+const fetchUserRank = () => {
+  $fetch<{
+    message: string;
+    data: {
+      rank: number;
+      totalPoints: number;
+      student_id: number;
+      firstname: string;
+      lastname: string;
+      earliestSubmission: string;
+    }
+  }>('/api/score', {
+    headers: {
+      Authorization: `Bearer ${tokenCookie.value}`
+    }
+  }).then((res) => {
+    currentRank.value = res.data.rank
+    currentScore.value = res.data.totalPoints
+  })
+}
+
+const fetchQuestion = () => {
+  $fetch<{
+    message: string;
+    questionWithSubmission: {
+      question_id: number;
+      question_title: string;
+      question_description: string;
+      points: number;
+      created_on: string;
+      submission: {
+        correct: boolean;
+        created_on: string;
+        submission_order: number;
+      }[]
+    }[];
+  }>('/api/question', {
+    headers: {
+      Authorization: `Bearer ${tokenCookie.value}`
+    }
+  }).then((res) => {
+    questions.value = res
+  })
+}
+
+let interval = setInterval(fetchUserRank, 5000)
+
+onUnmounted(() => {
+  clearInterval(interval)
 })
+
+fetchQuestion()
+fetchUserRank()
 </script>
 
 <template>
-  <NuxtLink to="/" class="underline">Back</NuxtLink>
-  <div class="grid place-items-center self-center w-full gap-2">
-    <h2 class="text-left mt-10 scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
+  <div class="flex flex-col w-full gap-2">
+    <h2 class="text-left mt-12 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0">
       Submit Flag
     </h2>
+    <div class="flex gap-4">
+      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-zinc-100 outline-zinc-800">
+        <span class="font-bold">Your rank</span><br/>
+        <span class="text-5xl">{{ currentRank }}</span>
+      </div>
+      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-zinc-100">
+        <span class="font-bold">Your Score</span><br/>
+        <span class="text-5xl">{{ currentScore }}</span>
+      </div>
+    </div>
 
-    <div class="w-1/2 flex flex-col gap-4">
-      <div class="grid items-center w-full gap-1.5">
-        <Label for="studentId">Student ID</Label>
-        <Input v-model="studentId" id="studentId" readonly disabled />
+    <div class="flex flex-col gap-4 w-full justify-center items-center">
+      <div class="flex flex-col gap-4 max-w-[560px] md:w-[560px] w-full">
+        <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" :question_id="question.question_id"
+          :question_title="question.question_title" :question_description="question.question_description"
+          :points="question.points" :created_on="question.created_on" :submission="question.submission"
+          :refreshQuestion="fetchQuestion">
+        </CtfQuizSubmitBox>
       </div>
 
-      <div class="grid items-center w-full gap-1.5">
-        <Label for="question">Question No.</Label>
-        <Select v-model="question" id="question">
-          <SelectTrigger>
-            <SelectValue placeholder="Question No." />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem :value="1">1</SelectItem>
-            <SelectItem :value="2">2</SelectItem>
-            <SelectItem :value="3">3</SelectItem>
-            <SelectItem :value="4">4</SelectItem>
-            <SelectItem :value="5">5</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div class="grid items-center w-full gap-1.5">
-        <Label for="flag">Flag<span class="text-red-500">*</span></Label>
-        <Input v-model="flag" id="flag" required />
-      </div>
-
-      <Button :disabled="!flagValid">Submit</Button>
     </div>
   </div>
 </template>

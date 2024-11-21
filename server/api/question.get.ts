@@ -30,7 +30,11 @@ function mapSubmissionsToQuestions(
   submissions: Submission[] | undefined
 ): QuestionWithSubmission[] {
   if (!submissions || submissions.length === 0) {
-    return questions.map((q) => ({ ...q, submission: null }));
+    return questions.map((q) => ({ ...q, submission: {
+      correct: false,
+      created_on: new Date(),
+      submission_order: -1,
+    } }));
   }
 
   const submissionMap: Record<number, Submission> = {};
@@ -46,7 +50,11 @@ function mapSubmissionsToQuestions(
           created_on: submissionMap[q.question_id].created_on,
           submission_order: submissionMap[q.question_id].submission_order,
         }
-      : null,
+      : {
+        correct: false,
+        created_on: new Date(),
+        submission_order: -1,
+      },
   }));
 }
 

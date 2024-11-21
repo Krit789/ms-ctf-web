@@ -69,6 +69,7 @@ export default defineEventHandler(async (event) => {
     const correct_submission_count = await tx.submissions.count({
       where: {
         correct: true,
+        question_id: Number(question_id)
       }
     })
     await tx.submissions.create({
@@ -85,12 +86,22 @@ export default defineEventHandler(async (event) => {
   correct_submission_count = await prisma.submissions.count({
     where: {
       correct: true,
+      question_id: Number(question_id)
     }
   })
 
   if (isCorrect) {
     setResponseStatus(event, 200);
-    return { message: `Congratulation! You've answered correctly${(correct_submission_count === 1) ? " as first blood!" : ""}`, correct: true, submission_order: correct_submission_count  };
+    let blood_message = "";
+    if (correct_submission_count === 1) {
+      blood_message = " as first blood!";
+    } else if (correct_submission_count === 2) {
+      blood_message = " as second blood!";
+    } else if (correct_submission_count === 3) {
+      blood_message = " as third blood!";
+    }
+
+    return { message: `Congratulation! You've answered correctly${blood_message}`, correct: true, submission_order: correct_submission_count  };
   } else {
     setResponseStatus(event, 200);
     return { message: "Sorry! That's not the right answer!", correct: false };

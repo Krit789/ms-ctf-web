@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource/bai-jamjuree':
+        specifier: ^5.1.0
+        version: 5.1.0
       '@nuxtjs/color-mode':
         specifier: ^3.5.2
         version: 3.5.2(magicast@0.3.5)(rollup@4.27.3)
@@ -581,6 +584,9 @@ packages:
 
   '@floating-ui/vue@1.1.5':
     resolution: {integrity: sha512-ynL1p5Z+woPVSwgMGqeDrx6HrJfGIDzFyESFkyqJKilGW1+h/8yVY29Khn0LaU6wHBRwZ13ntG6reiHWK6jyzw==}
+
+  '@fontsource/bai-jamjuree@5.1.0':
+    resolution: {integrity: sha512-iL5v55PS6josNJNm4xkDqcaY57E0SG5JXRFsPf+2YEVxZ3QpYJGwhcGvKjbAw8wKGIPl00sBYaSn0nSTz/ZeRA==}
 
   '@internationalized/date@3.5.6':
     resolution: {integrity: sha512-jLxQjefH9VI5P9UQuqB6qNKnvFt1Ky1TPIzHGsIlCi7sZZoMR8SdYbBGRvM0y+Jtb+ez4ieBzmiAUcpmPYpyOw==}
@@ -4715,6 +4721,8 @@ snapshots:
     transitivePeerDependencies:
       - '@vue/composition-api'
       - vue
+
+  '@fontsource/bai-jamjuree@5.1.0': {}
 
   '@internationalized/date@3.5.6':
     dependencies:
