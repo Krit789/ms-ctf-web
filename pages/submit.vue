@@ -27,7 +27,7 @@ onMounted(() => {
 
 <template>
   <NuxtLink to="/" class="underline">Back</NuxtLink>
-  <div class="grid place-items-center self-center w-full">
+  <div class="grid place-items-center self-center w-full gap-2">
     <h2 class="text-left mt-10 scroll-m-20 pb-2 text-3xl font-semibold tracking-tight transition-colors first:mt-0">
       Submit Flag
     </h2>
@@ -58,6 +58,7 @@ onMounted(() => {
         <Label for="flag">Flag<span class="text-red-500">*</span></Label>
         <Input v-model="flag" id="flag" required />
       </div>
+
       <Button :disabled="!flagValid">Submit</Button>
     </div>
   </div>
