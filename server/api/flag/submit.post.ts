@@ -90,10 +90,10 @@ export default defineEventHandler(async (event) => {
 
   if (isCorrect) {
     setResponseStatus(event, 200);
-    return { message: `Congratulation! You've answered correctly${(correct_submission_count) === 1 ? " as first blood!" : ""}`, submission_order: correct_submission_count  };
+    return { message: `Congratulation! You've answered correctly${(correct_submission_count === 1) ? " as first blood!" : ""}`, correct: true, submission_order: correct_submission_count  };
   } else {
     setResponseStatus(event, 200);
-    return { message: "Sorry! That's not the right answer!" };
+    return { message: "Sorry! That's not the right answer!", correct: false };
   }
 
 });
