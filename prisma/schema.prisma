@@ -13,7 +13,7 @@ datasource db {
 model Users {
   student_id Int           @id
   email      String        @unique
-  role       Role          @default(STUDENT) 
+  role       Role          @default(STUDENT)
   password   String?
   firstname  String
   lastname   String
@@ -23,34 +23,36 @@ model Users {
 }
 
 model Questions {
-  question_id          Int       @id
+  question_id          Int           @id
   question_title       String
   question_description String
   points               Int
-  created_on           DateTime  @default(now())
+  created_on           DateTime      @default(now())
   global_answer        Boolean
   Answers              Answers[]
+  Submissions          Submissions[]
 }
 
 model Answers {
   answer_id      Int       @id
   question_id    Int
   question       Questions @relation(fields: [question_id], references: [question_id])
-  student_id     Users?     @relation(fields: [for_student_id], references: [student_id])
+  student_id     Users?    @relation(fields: [for_student_id], references: [student_id])
   for_student_id Int?
   answer         String
 }
 
 model Submissions {
-  submission_id Int      @id
-  student       Users    @relation(fields: [student_id], references: [student_id])
+  submission_id Int       @id
+  student       Users     @relation(fields: [student_id], references: [student_id])
+  question      Questions @relation(fields: [question_id], references: [question_id])
+  question_id   Int
   student_id    Int
   flag          String
   correct       Boolean
   firstblood    Boolean
-  created_on    DateTime @default(now())
+  created_on    DateTime  @default(now())
 }
-
 
 enum Role {
   STUDENT
