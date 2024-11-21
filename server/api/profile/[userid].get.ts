@@ -1,3 +1,4 @@
+import { flattenObject } from "~/lib/flatten";
 import prisma from "~/lib/prisma";
 
 
@@ -44,6 +45,8 @@ export default defineEventHandler(async (event) => {
   return {
     message: "Success",
     user: users,
-    submissions,
+    submissions: submissions.map((submission) => 
+      flattenObject(submission),
+    ),
   }
 });
