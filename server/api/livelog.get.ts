@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
       question: {
         select: {
           points: true,
+          question_id: true,
           question_title: true,
         },
       },

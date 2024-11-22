@@ -2,7 +2,9 @@ import prisma from "~/lib/prisma";
 
 export default defineEventHandler(async (event) => {
   // Get student_id from context
-  const student_id = event.context.user_id;
+  let { student_id } = getQuery(event);
+  student_id = Number(student_id || event.context.user_id);
+
   if (!student_id) {
     throw createError({
       statusCode: 400,

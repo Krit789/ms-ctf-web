@@ -16,23 +16,25 @@
   <div class="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 place-content-center mt-8 gap-4">
     <div class="bg-gradient-to-tr from-red-400 to bg-red-100 h-48 p-4 rounded-lg  hover:scale-105 transition-transform">
       <NuxtLink class="underline" to="/leaderboard">
-        <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0 ">
+        <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0 h-48">
           Leaderboard
         </h2>
       </NuxtLink>
     </div>
-    <div class="bg-gradient-to-tr from-emerald-400 to bg-emerald-100 h-48 p-4 rounded-lg  hover:scale-105 transition-transform">
+    <div
+      class="bg-gradient-to-tr from-emerald-400 to bg-emerald-100 h-48 p-4 rounded-lg  hover:scale-105 transition-transform">
       <NuxtLink class="underline" to="/livelog">
         <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0 h-48">
           Live Log
         </h2>
       </NuxtLink>
     </div>
-    <div class="bg-gradient-to-tr from-cyan-400 to bg-cyan-100 h-48 p-4 rounded-lg hover:scale-105 transition-transform">
+    <div
+      class="bg-gradient-to-tr from-cyan-400 to bg-cyan-100 h-48 p-4 rounded-lg hover:scale-105 transition-transform">
       <NuxtLink class="underline" to="/submit">
-      <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0 h-48">
-        Submit Flag
-      </h2>
+        <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0 h-48">
+          Submit Flag
+        </h2>
       </NuxtLink>
     </div>
   </div>

@@ -7,7 +7,11 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "prisma:inline": "copy ./node_modules/.prisma/client/*.js ./node_modules/@prisma/client",
+    "prisma:migrate": "prisma migrate deploy && npm run prisma:inline",
+    "prisma:migrate:dev": "prisma migrate dev && npm run prisma:inline",
+    "prisma:generate": "prisma generate && npm run prisma:inline"
   },
   "dependencies": {
     "@fontsource/bai-jamjuree": "^5.1.0",
@@ -25,7 +29,8 @@
     "ldap-authentication": "^3.2.4",
     "lucide-vue-next": "^0.460.0",
     "luxon": "^3.5.0",
-    "nuxt": "^3.14.1592",
+    "nitropack": "2.9.7",
+    "nuxt": "^3.13.2",
     "radix-vue": "^1.9.10",
     "shadcn-nuxt": "^0.11.3",
     "tailwind-merge": "^2.5.4",

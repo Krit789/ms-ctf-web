@@ -70,12 +70,12 @@ fetchUserRank()
     <h2 class="text-left mt-12 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0">
       Submit Flag
     </h2>
-    <div class="flex gap-4">
-      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-zinc-100 outline-zinc-800">
+    <div class="flex gap-8 justify-center mb-4">
+      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-gradient-to-tr  from-zinc-100 to-emerald-300 outline-zinc-800">
         <span class="font-bold">Your rank</span><br/>
         <span class="text-5xl">{{ currentRank }}</span>
       </div>
-      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-zinc-100">
+      <div class="size-32 shadow-lg outline-1 rounded-md p-4 bg-gradient-to-tr  from-zinc-100 to-orange-300">
         <span class="font-bold">Your Score</span><br/>
         <span class="text-5xl">{{ currentScore }}</span>
       </div>

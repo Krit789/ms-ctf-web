@@ -40,4 +40,7 @@ const logout = () => {
   <div class="max-w-screen-xl mx-auto pt-28 xl:px-0 px-8">
     <slot></slot>
   </div>
+  <div class="w-full flex justify-center items-center p-8 bg-cyan-200 mt-16">
+    Made with 🩸 by @Krit789, @phatsanphonna and @OatChayanont
+  </div>
 </template>

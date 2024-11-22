@@ -5,6 +5,7 @@ const leaderboard = ref();
 const lastUpdated = ref(Date.now());
 const isLoading = ref(false);
 const flashRows = ref<number[]>([]); // Array to store row indices to flash
+const cookieToken = useCookie('access_token');
 
 const fetchLeaderboard = () => {
   isLoading.value = true;
@@ -16,7 +17,11 @@ const fetchLeaderboard = () => {
       lastname: string;
       totalPoints: number;
     }[];
-  }>('/api/leaderboard')
+  }>('/api/leaderboard', {
+    headers: {
+      Authorization: `Bearer ${cookieToken.value}`,
+    },  
+  })
     .then((res) => {
       const newFlashRows: number[] = [];
       if (leaderboard.value) {
@@ -92,7 +97,7 @@ onUnmounted(() => {
           :class="{ 'flash-row': flashRows.includes(indx) }"
         >
           <TableCell>{{ indx + 1 }}</TableCell>
-          <TableCell>{{ student.student_id }}</TableCell>
+          <TableCell><NuxtLink :to="`/profile/${student.student_id}`" class="underline hover:text-cyan-600 transition-all">{{ student.student_id }}</NuxtLink></TableCell>
           <TableCell>{{ student.firstname }}</TableCell>
           <TableCell>{{ student.lastname }}</TableCell>
           <TableCell>{{ student.totalPoints }}</TableCell>

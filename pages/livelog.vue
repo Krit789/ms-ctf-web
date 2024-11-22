@@ -17,6 +17,7 @@ import {
 interface StudentData {
   question_points: number;
   question_question_title: string;
+  question_question_id: number;
   student_firstname: string;
   student_lastname: string;
   student_id: number;
@@ -107,17 +108,22 @@ onUnmounted(() => {
           <TableRow>
             <TableHead>Student ID</TableHead>
             <TableHead>Firstname</TableHead>
-            <TableHead>Lastname</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Verdict</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody v-if="LiveLog">
           <TableRow v-for="submission, indx in LiveLog.data">
-            <TableCell>{{ submission.student_id }}</TableCell>
+            <TableCell>
+              <NuxtLink :to="`/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
+                {{ submission.student_id }}</NuxtLink>
+            </TableCell>
             <TableCell>{{ submission.student_firstname }}</TableCell>
-            <TableCell>{{ submission.student_lastname }}</TableCell>
-            <TableCell>{{ submission.question_question_title }}</TableCell>
+            <TableCell>
+            <NuxtLink :to="`/question/${submission.question_question_id }`"
+              class="underline hover:text-cyan-600 transition-all">
+              {{ submission.question_question_title }}</NuxtLink>
+          </TableCell>
             <TableCell :class="{ 'bg-green-400': submission.correct, 'bg-red-400': !submission.correct }">{{
               submission.correct ? "Correct" : "Wrong" }}</TableCell>
           </TableRow>
