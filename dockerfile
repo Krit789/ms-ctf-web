@@ -1,6 +1,6 @@
 FROM node:lts-alpine
 WORKDIR /app
-
+COPY . .
 RUN cd app && npm install -g pnpm && pnpm install && pnpm build
 
 ENV NODE_ENV=production
