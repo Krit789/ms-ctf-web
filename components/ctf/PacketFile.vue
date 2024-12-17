@@ -526,7 +526,7 @@ data.value.forEach((i) => {
   <h3 class="text-xl">Your CTF File</h3>
   <div v-if="filteredData">
     <div v-for="i, index in filteredData.answers" :key="index" class="flex flex-col gap-4 border-2 p-4 rounded-md">
-      <NuxtLink :to="`/ctf/ctf01-${index}${i}.pka`" class="hover:underline text-blue-500"> Problem {{ index }} Download</NuxtLink>
+      <NuxtLink :to="`/ctf/ctf01-${index}${i}.pka`" target="_blank" class="hover:underline text-blue-500"> Problem {{ index }} Download</NuxtLink>
     </div>
   </div>
 </div>
