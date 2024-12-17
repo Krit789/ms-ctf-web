@@ -9,27 +9,27 @@ export default defineEventHandler(async (event) => {
     await readBody(event);
   let { spoof } = getQuery(event);
 
-  if (spoof === "spoofkey") {
-    const stu_id = username;
-    const user = await db
-      .selectFrom("Users")
-      .select(["student_id", "role", "password"])
-      .where("student_id", "=", stu_id)
-      .executeTakeFirst();
-    if (user?.student_id && user.role) {
-      const token = jwt.sign(
-        { u_id: user.student_id, u_role: user.role },
-        config.jwt_secret,
-        { expiresIn: "1d" }
-      );
-      return { message: "Login success", access_token: token };
-    }
-    return { message: "User doesn't exist" };
-  }
+  // if (spoof === "spoofkey") {
+  //   const stu_id = username;
+  //   const user = await db
+  //     .selectFrom("Users")
+  //     .select(["student_id", "role", "password"])
+  //     .where("student_id", "=", stu_id)
+  //     .executeTakeFirst();
+  //   if (user?.student_id && user.role) {
+  //     const token = jwt.sign(
+  //       { u_id: user.student_id, u_role: user.role },
+  //       config.jwt_secret,
+  //       { expiresIn: "1d" }
+  //     );
+  //     return { message: "Login success", access_token: token };
+  //   }
+  //   return { message: "User doesn't exist" };
+  // }
 
   if (!username || !password) {
     setResponseStatus(event, 400);
-    return { message: "Username and password are required" };
+    return { message: "Username and password are required (Code 1)" };
   }
 
   if (username.startsWith("it")) {
@@ -46,22 +46,13 @@ export default defineEventHandler(async (event) => {
     const user = await db
       .selectFrom("Users")
       .select(["student_id", "role", "password"])
-      .where("student_id", "=", stu_id)
+      .where("student_id", "=", stu_id.startsWith('it') ? stu_id.slice(2) : stu_id)
       .executeTakeFirst();
-    // const user = await prisma.users.findFirst({
-    //   where: {
-    //     student_id: stu_id,
-    //   },
-    //   select: {
-    //     student_id: true,
-    //     role: true,
-    //     password: true,
-    //   }
-    // });
+
 
     if (!user || !password) {
       setResponseStatus(event, 400);
-      return { message: "Username or password is incorrect" };
+      return { message: "Username or password is incorrect (Code 2)" };
     }
 
     if (!user.password) {
@@ -74,7 +65,7 @@ export default defineEventHandler(async (event) => {
         adminPassword: config.ldap_password,
         userSearchBase: config.ldap_user_search_base,
         usernameAttribute: "sAMAccountName",
-        username: user.student_id,
+        username: stu_id,
         userPassword: password,
         attributes: ["dn", "sn", "cn"],
       };
@@ -82,9 +73,10 @@ export default defineEventHandler(async (event) => {
       try {
         result = await authenticate(options);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
+        // console.log(options);
         setResponseStatus(event, 400);
-        return { message: "Username or password is incorrect" };
+        return { message: "Username or password is incorrect (Code 3)" };
       }
     }
     const token = jwt.sign(
