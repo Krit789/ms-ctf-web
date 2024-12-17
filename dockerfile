@@ -29,13 +29,13 @@ COPY --from=builder /app/.output/public ./.output/public
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-ENV DATABASE_URL
-ENV NUXT_DATABASE_URL
-ENV NUXT_LDAP_SERVER
-ENV NUXT_LDAP_BIND
-ENV NUXT_LDAP_PASSWORD
-ENV NUXT_LDAP_USER_SEARCH_BASE
-ENV NUXT_JWT_SECRET
+ENV DATABASE_URL=
+ENV NUXT_DATABASE_URL=
+ENV NUXT_LDAP_SERVER=
+ENV NUXT_LDAP_BIND=
+ENV NUXT_LDAP_PASSWORD=
+ENV NUXT_LDAP_USER_SEARCH_BASE=
+ENV NUXT_JWT_SECRET=
 
 EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
