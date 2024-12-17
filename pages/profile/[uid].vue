@@ -1,29 +1,22 @@
 <script setup lang="ts">
+import { Skeleton } from '@/components/ui/skeleton'
+import type { ProfileResponse } from '~/server/api/profile/[userid].get'
+
 const route = useRoute()
 
 const cookieToken = useCookie('access_token')
 const student_id = route.params.uid
-const studentUser = ref()
-const studentSubmission = ref()
+const studentUser = ref<ProfileResponse['user']>()
+const studentSubmission = ref<ProfileResponse['submissions']>()
 
 const currentRank = ref(0)
 const currentScore = ref(0)
+const isRankLoading = ref(true)
+const isProfileLoading = ref(true)
+
 
 const fetchStudent = async () => {
-  await $fetch<{
-    message: string;
-    user: {
-      student_id: number;
-      firstname: string;
-      lastname: string;
-    };
-    submissions: {
-      question_question_title: string;
-      question_question_description: string;
-      question_points: number;
-      question_created_on: string;
-    }
-  }>(`/api/profile/${student_id}`, {
+  await $fetch<ProfileResponse>(`/api/profile/${student_id}`, {
     headers: {
       Authorization: `Bearer ${cookieToken.value}`,
     },
@@ -35,6 +28,8 @@ const fetchStudent = async () => {
     .catch((err) => {
       console.error(err);
       navigateTo('/leaderboard', { replace: true });
+    }).finally(() => {
+      isProfileLoading.value = false
     });
 }
 
@@ -59,6 +54,8 @@ const fetchUserRank = () => {
   }).then((res) => {
     currentRank.value = res.data.rank
     currentScore.value = res.data.totalPoints
+  }).finally(() => {
+    isRankLoading.value = false
   })
 }
 
@@ -71,16 +68,29 @@ fetchUserRank()
   <div class="flex flex-col">
     <div
       class="flex md:flex-row flex-col justify-between rounded-lg outline-1 outline-zinc-600 p-8 w-full drop-shadow-2xl bg-gradient-to-tr from-cyan-100 to-cyan-400 gap-y-4">
-      <div v-if="studentUser">
-        <div class="font-bold text-5xl">{{ studentUser?.student_id }}</div>
-        <div class="text-4xl mt-2">{{ studentUser?.firstname }} {{ studentUser?.lastname }}</div>
+      <div>
+        <div class="font-bold text-5xl">{{ studentUser?.student_id }}
+        </div>
+        <div class="text-4xl mt-2" v-if="isProfileLoading">
+          <Skeleton class="w-56 h-12 rounded-full"  />
+        </div>
+        <div class="text-4xl mt-2" v-else>{{ studentUser?.firstname }} {{ studentUser?.lastname }}</div>
+        <div class="flex flex-row gap-x-4 mt-2" v-if="isProfileLoading">
+          <Skeleton class="w-32 h-8 rounded-full"  />
+          <Skeleton class="w-48 h-8 rounded-full"  />
+        </div>
       </div>
-      <div v-else></div>
       <div class="flex gap-x-4">
         <div class="flex flex-col size-32 p-4 bg-gradient-to-br from-cyan-100 to-cyan-400 rounded-md shadow-lg"><span
-            class="font-bold text-2xl">Rank</span><span class="text-4xl">{{ currentRank }}</span></div>
+            class="font-bold text-2xl">Rank</span>
+          <span class="text-4xl" v-if="!isRankLoading">{{ currentRank }}</span>
+          <Skeleton class="w-full h-12 rounded-full" v-else />
+        </div>
         <div class="flex flex-col size-32 p-4 bg-gradient-to-br from-cyan-100 to-cyan-400 rounded-md shadow-lg"><span
-            class="font-bold text-2xl">Score</span><span class="text-4xl">{{ currentScore }}</span></div>
+            class="font-bold text-2xl">Score</span>
+          <span class="text-4xl" v-if="!isRankLoading">{{ currentScore }}</span>
+          <Skeleton class="w-full h-12 rounded-full" v-else />
+        </div>
       </div>
     </div>
     <Table class="text-2xl mt-8">
@@ -96,14 +106,17 @@ fetchUserRank()
         <TableRow v-for="(submission, indx) in studentSubmission">
           <TableCell>{{ indx + 1 }}</TableCell>
           <TableCell>
-            <NuxtLink :to="`/question/${submission.question_question_id }`"
-              class="underline hover:text-cyan-600 transition-all">
-              {{ submission.question_question_title }}</NuxtLink>
+            <NuxtLink :to="`/question/${submission.question_id}`" class="underline hover:text-cyan-600 transition-all">
+              {{ submission.question_title }}</NuxtLink>
           </TableCell>
-          <TableCell>{{ submission.question_points }}</TableCell>
-          <TableCell>{{ new Date(submission.question_created_on).toLocaleString('en-US', {
+          <TableCell>
+            <span class="flex gap-x-2">
+            {{ submission.points_with_bonus }}
+            <span class="text-xs grid place-items-center px-2 text-white bg-red-400 rounded-full" v-if="submission.points_with_bonus - (submission.base_points ?? 0) !== 0">{{ submission.points_with_bonus - (submission.base_points ?? 0) }}</span>
+          </span></TableCell>
+          <TableCell>{{ new Date(submission.created_on).toLocaleString('th', {
             dateStyle: 'short',
-            timeStyle: 'short'
+            timeStyle: 'medium'
           }) }}</TableCell>
         </TableRow>
       </TableBody>

@@ -1,80 +1,66 @@
-import prisma from "~/lib/prisma";
+// server/api/leaderboard.ts
 
+import { getStudentUsers, getCorrectSubmissions } from '~/server/utils/dbquery'
+import { calculatePointsForSubmission, sortUserScores, calculateUserStats } from '~/server/utils/score'
+import type { UserScore, LeaderboardResponse, SubmissionWithPoints } from '~/types/score'
 
-export default defineEventHandler(async (event) => {
-  const users = await prisma.users.findMany({
-    select: {
-      student_id: true,
-      firstname: true,
-      lastname: true,
-    },
-  });
+export default defineEventHandler(async (event): Promise<LeaderboardResponse> => {
+  // Fetch data in parallel
+  const [users, submissions] = await Promise.all([
+    getStudentUsers(),
+    getCorrectSubmissions(),
+  ])
 
-  const submissions = await prisma.submissions.findMany({
-    where: {
-      correct: true,
-    },
-    select: {
-      question: {
-        select: {
-          points: true,
-        },
-      },
-      student_id: true,
-      created_on: true,
-      submission_order: true,
-    },
-  });
+  // Create a map of question submissions for efficient lookup
+  const submissionsByQuestion = new Map<number, SubmissionWithPoints[]>()
 
-  const mappedUsers = users.map((user) => {
-    const userSubmissions = submissions.filter(
-      (submission) => submission.student_id === user.student_id
-    );
+  // Process submissions and calculate points
+  for (const submission of submissions) {
+    const questionId = submission.question_id
+    const questionSubmissions = submissionsByQuestion.get(questionId) || []
+    
+    const points = calculatePointsForSubmission(
+      submission.points,
+      questionSubmissions.length + 1
+    )
 
-    let totalPoints = userSubmissions.reduce(
-      (acc, submission) => acc + submission.question.points,
-      0
-    );
-    // Apply bonus points based on submission order
-    const pointsWithBonus = userSubmissions.reduce((acc, submission) => {
-      let bonus = 1;
-      if (submission.submission_order === 1) bonus = 1.2;
-      else if (submission.submission_order === 2) bonus = 1.1;
-      else if (submission.submission_order === 3) bonus = 1.05;
-      return acc + submission.question.points * bonus;
-    }, 0);
+    questionSubmissions.push({ ...submission, points })
+    submissionsByQuestion.set(questionId, questionSubmissions)
+  }
 
-    totalPoints = Math.floor(pointsWithBonus);
-    // Get the latest submission time
-    const earliestSubmission =
-      userSubmissions.length > 0
-        ? Math.max(...userSubmissions.map((s) => s.created_on.getTime()))
-        : Date.now();
+  // Group submissions by student
+  const submissionsByStudent = new Map<number, SubmissionWithPoints[]>()
+  for (const questionSubmissions of submissionsByQuestion.values()) {
+    for (const submission of questionSubmissions) {
+      const studentSubmissions = submissionsByStudent.get(submission.student_id) || []
+      studentSubmissions.push(submission)
+      submissionsByStudent.set(submission.student_id, studentSubmissions)
+    }
+  }
+
+  // Calculate user scores
+  const userScores: UserScore[] = users.map(user => {
+    const userSubmissions = submissionsByStudent.get(user.student_id) || []
+    const { totalPoints, latestSubmission } = calculateUserStats(userSubmissions)
 
     return {
       student_id: user.student_id,
       firstname: user.firstname,
       lastname: user.lastname,
       totalPoints,
-      earliestSubmission,
-    };
-  });
+      latestSubmission,
+    }
+  })
 
-  const sorted = mappedUsers.sort((a, b) =>
-    b.totalPoints === a.totalPoints
-      ? a.earliestSubmission - b.earliestSubmission
-      : b.totalPoints - a.totalPoints
-  );
+  const sortedScores = sortUserScores(userScores)
 
   return {
     message: "success",
-    rankings: sorted.map((user) => {
-      return {
-        student_id: user.student_id,
-        firstname: user.firstname,
-        lastname: user.lastname,
-        totalPoints: user.totalPoints,
-      };
-    }),
-  };
-});
+    rankings: sortedScores.map(({ student_id, firstname, lastname, totalPoints }) => ({
+      student_id,
+      firstname,
+      lastname,
+      totalPoints,
+    })),
+  }
+})

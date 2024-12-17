@@ -28,7 +28,7 @@ const fetchLeaderboard = () => {
         // Compare old and new data to find changed rows
         res.rankings.forEach((student, index) => {
           const oldStudent = leaderboard.value.rankings.find(
-            (s) => s.student_id === student.student_id
+            (s: { student_id: number; totalPoints: number }) => s.student_id === student.student_id
           );
           if (
             !oldStudent ||
@@ -72,7 +72,7 @@ onUnmounted(() => {
         >
           Leaderboard
         </h2>
-        <p class="text-2xl">Bootcamp CTF Alpha</p>
+        <p class="text-2xl">CTF.IT</p>
       </div>
       <div class="text-right">
         <span class="animate-pulse" v-if="isLoading">Updating...</span>

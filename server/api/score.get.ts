@@ -1,95 +1,88 @@
-import prisma from "~/lib/prisma";
+// server/api/score.ts
 
-export default defineEventHandler(async (event) => {
+import { getStudentUsers, getCorrectSubmissions, getAllUsers } from '~/server/utils/dbquery'
+import { calculatePointsForSubmission, calculateUserStats, sortUserScores } from '~/server/utils/score'
+import type { UserScore, ScoreResponse, SubmissionWithPoints } from '~/types/score'
+import type { H3Event } from 'h3'
+
+export default defineEventHandler(async (event: H3Event): Promise<ScoreResponse> => {
   // Get student_id from context
-  let { student_id } = getQuery(event);
-  student_id = Number(student_id || event.context.user_id);
+  let { student_id } = getQuery(event)
+  student_id = Number(student_id || event.context.user_id)
 
   if (!student_id) {
     throw createError({
       statusCode: 400,
       message: "Unauthorized",
-    });
+    })
   }
 
-  const users = await prisma.users.findMany({
-    select: {
-      student_id: true,
-      firstname: true,
-      lastname: true,
-    },
-  });
+  // Fetch data in parallel
+  const [users, submissions] = await Promise.all([
+    event.context.u_role === 'STUDENT' ? getStudentUsers() : getAllUsers(),
+    getCorrectSubmissions(),
+  ])
 
-  const submissions = await prisma.submissions.findMany({
-    where: {
-      correct: true,
-    },
-    select: {
-      question: {
-        select: {
-          points: true,
-        },
-      },
-      student_id: true,
-      created_on: true,
-      submission_order: true,
-    },
-  });
+  // Create a map of question submissions for efficient lookup
+  const submissionsByQuestion = new Map<number, SubmissionWithPoints[]>()
 
-  const mappedUsers = users.map((user) => {
-    const userSubmissions = submissions.filter(
-      (submission) => submission.student_id === user.student_id
-    );
+  // Process submissions and calculate points in a single pass
+  for (const submission of submissions) {
+    const questionId = submission.question_id
+    const questionSubmissions = submissionsByQuestion.get(questionId) || []
+    
+    const points = calculatePointsForSubmission(
+      submission.points,
+      questionSubmissions.length + 1
+    )
 
-    let totalPoints = userSubmissions.reduce(
-      (acc, submission) => acc + submission.question.points,
-      0
-    );
-    // Apply bonus points based on submission order
-    const pointsWithBonus = userSubmissions.reduce((acc, submission) => {
-      let bonus = 1;
-      if (submission.submission_order === 1) bonus = 1.2;
-      else if (submission.submission_order === 2) bonus = 1.1;
-      else if (submission.submission_order === 3) bonus = 1.05;
-      return acc + submission.question.points * bonus;
-    }, 0);
+    questionSubmissions.push({ ...submission, points })
+    submissionsByQuestion.set(questionId, questionSubmissions)
+  }
 
-    totalPoints = Math.floor(pointsWithBonus);
-    // Get the latest submission time
-    const earliestSubmission =
-      userSubmissions.length > 0
-        ? Math.max(...userSubmissions.map((s) => s.created_on.getTime()))
-        : Date.now();
+  // Create a map for submissions by student for efficient lookup
+  const submissionsByStudent = new Map<number, SubmissionWithPoints[]>()
+  
+  // Flatten and group submissions by student in a single pass
+  for (const questionSubmissions of submissionsByQuestion.values()) {
+    for (const submission of questionSubmissions) {
+      const studentSubmissions = submissionsByStudent.get(submission.student_id) || []
+      studentSubmissions.push(submission)
+      submissionsByStudent.set(submission.student_id, studentSubmissions)
+    }
+  }
+
+  // Calculate user scores
+  const userScores: UserScore[] = users.map(user => {
+    const userSubmissions = submissionsByStudent.get(user.student_id) || []
+    const { totalPoints, latestSubmission } = calculateUserStats(userSubmissions)
 
     return {
       student_id: user.student_id,
       firstname: user.firstname,
       lastname: user.lastname,
       totalPoints,
-      earliestSubmission,
-    };
-  });
+      latestSubmission,
+    }
+  })
 
-  const sorted = mappedUsers.sort((a, b) =>
-    b.totalPoints === a.totalPoints
-      ? a.earliestSubmission - b.earliestSubmission
-      : b.totalPoints - a.totalPoints
-  );
+  // Sort users by points and submission time
+  const sortedScores = sortUserScores(userScores)
 
-  // Find user's rank and data
-  const userIndex = sorted.findIndex(user => user.student_id === student_id);
+  // Find user's rank
+  const userIndex = sortedScores.findIndex((user) => user.student_id === student_id)
   if (userIndex === -1) {
     throw createError({
       statusCode: 404,
       message: "User not found",
-    });
+    })
   }
 
   return {
     message: "success",
     data: {
       rank: userIndex + 1,
-      ...sorted[userIndex]
-    }
-  };
-});
+      ...sortedScores[userIndex],
+    },
+  }
+})

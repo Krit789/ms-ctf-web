@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Flag } from 'lucide-vue-next';
 const userData = useUserState()
 
 
@@ -16,7 +17,7 @@ const logout = () => {
       <div
         class="bg-zinc-700/70 backdrop-blur-md drop-shadow-xl rounded-full w-full max-w-screen-xl h-16 flex justify-between items-center px-8">
         <NuxtLink to="/">
-          <h1 class="text-white text-2xl font-bold text-center">CTF Bootcamp</h1>
+          <h1 class="text-white text-2xl font-bold text-center flex flex-row items-center gap-x-2"><Flag />CTF.IT</h1>
         </NuxtLink>
         <div class="flex gap-x-4 items-center">
           <NuxtLink v-if="userData" to="/" class="text-white md:block hidden">Home</NuxtLink>

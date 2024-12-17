@@ -15,11 +15,11 @@ import {
 } from '@/components/ui/pagination'
 
 interface StudentData {
-  question_points: number;
-  question_question_title: string;
-  question_question_id: number;
-  student_firstname: string;
-  student_lastname: string;
+  points: number;
+  question_title: string;
+  question_id: number;
+  firstname: string;
+  lastname: string;
   student_id: number;
   created_on: string; // Consider using Date if you need to manipulate it as a date object
   correct: boolean;
@@ -93,7 +93,7 @@ onUnmounted(() => {
       <div>
         <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0">
           Submission Log</h2>
-        <p class="text-2xl">Bootcamp CTF Alpha</p>
+        <p class="text-2xl">CTF.IT</p>
       </div>
       <div class="text-right">
         <span class="animate-pulse" v-if="isLoading">Updating...</span>
@@ -118,11 +118,11 @@ onUnmounted(() => {
               <NuxtLink :to="`/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
                 {{ submission.student_id }}</NuxtLink>
             </TableCell>
-            <TableCell>{{ submission.student_firstname }}</TableCell>
+            <TableCell>{{ submission.firstname }}</TableCell>
             <TableCell>
-            <NuxtLink :to="`/question/${submission.question_question_id }`"
+            <NuxtLink :to="`/question/${submission.question_id }`"
               class="underline hover:text-cyan-600 transition-all">
-              {{ submission.question_question_title }}</NuxtLink>
+              {{ submission.question_title }}</NuxtLink>
           </TableCell>
             <TableCell :class="{ 'bg-green-400': submission.correct, 'bg-red-400': !submission.correct }">{{
               submission.correct ? "Correct" : "Wrong" }}</TableCell>

@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { Skeleton } from '@/components/ui/skeleton'
+
 const route = useRoute()
 
 const cookieToken = useCookie('access_token')
 const question_id = route.params.qid
 const question = ref()
 const questionSubmission = ref()
+const isQuestionLoading = ref(true)
+
 
 
 const fetchQuestion = () => {
@@ -29,6 +33,8 @@ const fetchQuestion = () => {
   }).then((res) => {
     question.value = res.question
     questionSubmission.value = res.submissions
+  }).finally(() => {
+    isQuestionLoading.value = false
   })
 }
 
@@ -39,12 +45,19 @@ fetchQuestion()
 <template>
   <div class="flex flex-col">
     <div
-      class="flex md:flex-row flex-col justify-between rounded-lg outline-1 outline-zinc-600 p-8 w-full drop-shadow-2xl bg-gradient-to-tr from-cyan-100 to-cyan-400 gap-y-4">
-      <div v-if="question">
-        <div class="font-bold text-5xl">{{ question?.question_id }}</div>
-        <div class="text-4xl mt-2">{{ question?.question_title }}<br/><span class="text-lg">{{ question?.question_description }}</span></div>
+      class="flex md:flex-row flex-col justify-between rounded-lg outline-1 outline-zinc-600 p-8 w-full drop-shadow-2xl bg-gradient-to-tr from-cyan-100 to-cyan-400 gap-y-4 mt-4 relative">
+      <div
+        class="font-bold text-5xl absolute -top-5 -left-5 rounded-lg drop-shadow-xl text-white bg-gradient-to-tr from-blue-400 to-blue-800 size-16 grid place-items-center">
+        {{ question?.question_id }}</div>
+      <div class="mt-2 w-full">
+        <h3 class="text-4xl font-bold" v-if="!isQuestionLoading">{{ question?.question_title }}</h3>
+        <Skeleton class="w-64 h-8 mt-2 rounded-full" v-else />
+        <p class="text-lg leading-snug mt-2" v-if="!isQuestionLoading">{{ question?.question_description }}</p>
+        <div class="flex flex-col w-full" v-else>
+          <Skeleton class="w-full h-4 mt-2 rounded-full" />
+          <Skeleton class="w-full h-4 mt-2 rounded-full" />
+        </div>
       </div>
-      <div v-else></div>
     </div>
     <Table class="text-2xl mt-8">
       <TableHeader>
@@ -60,14 +73,14 @@ fetchQuestion()
         <TableRow v-for="(submission, indx) in questionSubmission">
           <TableCell>{{ indx + 1 }}</TableCell>
           <TableCell>
-              <NuxtLink :to="`/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
-                {{ submission.student_id }}</NuxtLink>
-            </TableCell>
-          <TableCell>{{ submission.student_firstname }}</TableCell>
-          <TableCell>{{ submission.student_lastname }}</TableCell>
-          <TableCell>{{ new Date(submission.created_on).toLocaleString('en-US', {
+            <NuxtLink :to="`/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
+              {{ submission.student_id }}</NuxtLink>
+          </TableCell>
+          <TableCell>{{ submission.firstname }}</TableCell>
+          <TableCell>{{ submission.lastname }}</TableCell>
+          <TableCell>{{ new Date(submission.created_on).toLocaleString('th', {
             dateStyle: 'short',
-            timeStyle: 'short'
+            timeStyle: 'medium'
           }) }}</TableCell>
         </TableRow>
       </TableBody>

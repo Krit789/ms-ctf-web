@@ -3,8 +3,8 @@ import '@fontsource/bai-jamjuree'
 import 'vue3-toastify/dist/index.css';
 
 useSeoMeta({
-        title: 'Bootcamp CTF Alpha',
-        ogTitle: 'Bootcamp CTF Alpha',
+        title: 'CTF.IT',
+        ogTitle: 'CTF.IT',
         description:
             'CTF Bootcamp for IT Infrastructure Students',
         ogDescription:
