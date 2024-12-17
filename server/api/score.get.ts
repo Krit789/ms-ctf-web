@@ -8,7 +8,7 @@ import type { H3Event } from 'h3'
 export default defineEventHandler(async (event: H3Event): Promise<ScoreResponse> => {
   // Get student_id from context
   let { student_id } = getQuery(event)
-  student_id = Number(student_id || event.context.user_id)
+  student_id = student_id || event.context.user_id
 
   if (!student_id) {
     throw createError({
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event: H3Event): Promise<ScoreResponse>
   }
 
   // Create a map for submissions by student for efficient lookup
-  const submissionsByStudent = new Map<number, SubmissionWithPoints[]>()
+  const submissionsByStudent = new Map<string, SubmissionWithPoints[]>()
   
   // Flatten and group submissions by student in a single pass
   for (const questionSubmissions of submissionsByQuestion.values()) {

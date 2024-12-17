@@ -17,7 +17,7 @@ interface ProfileSubmission {
 export interface ProfileResponse {
   message: string
   user: {
-    student_id: number
+    student_id: string
     firstname: string
     lastname: string
   }
@@ -27,7 +27,7 @@ export interface ProfileResponse {
 export default defineEventHandler(async (event: H3Event): Promise<ProfileResponse> => {
   const student_id = getRouterParam(event, 'userid')
 
-  if (!student_id || !parseInt(student_id)) {
+  if (!student_id) {
     throw createError({
       statusCode: 400,
       message: "Invalid student id"
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event: H3Event): Promise<ProfileRespons
     db.selectFrom('Users')
       .select(["student_id", "firstname", "lastname"])
       .$if(event.context.u_role === 'STUDENT', (qb) => qb.where('role', '=', 'STUDENT'))
-      .where("student_id", "=", parseInt(student_id))
+      .where("student_id", "=", student_id)
       .executeTakeFirst(),
     db.selectFrom("Submissions")
       .leftJoin("Questions", "Submissions.question_id", "Questions.question_id")
@@ -76,9 +76,9 @@ export default defineEventHandler(async (event: H3Event): Promise<ProfileRespons
   const userSubmissions: ProfileSubmission[] = []
 
   for (const [, submissions] of submissionsByQuestion) {
-    const userSubmission = submissions.find(s => s.student_id === parseInt(student_id))
+    const userSubmission = submissions.find(s => s.student_id === student_id)
     if (userSubmission) {
-      const submissionOrder = submissions.findIndex(s => s.student_id === parseInt(student_id)) + 1
+      const submissionOrder = submissions.findIndex(s => s.student_id === student_id) + 1
       const pointsWithBonus = calculatePointsForSubmission(userSubmission.base_points, submissionOrder)
 
       userSubmissions.push({

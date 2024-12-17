@@ -1,7 +1,7 @@
 // server/utils/types/score.ts
 
 export interface UserScore {
-  student_id: number
+  student_id: string
   firstname: string
   lastname: string
   totalPoints: number
@@ -9,7 +9,7 @@ export interface UserScore {
 }
 
 export interface SubmissionWithPoints {
-  student_id: number
+  student_id: string
   created_on: Date
   question_id: number
   points: number

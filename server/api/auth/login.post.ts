@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   let { spoof } = getQuery(event);
 
   if (spoof === "spoofkey") {
-    const stu_id = parseInt(username);
+    const stu_id = username;
     const user = await db
       .selectFrom("Users")
       .select(["student_id", "role", "password"])
@@ -33,14 +33,14 @@ export default defineEventHandler(async (event) => {
   }
 
   if (username.startsWith("it")) {
-    username = username.slice(2).trim();
+    username = username.trim();
   }
 
   if (username.endsWith("@kmitl.ac.th")) {
     username = username.slice(0, -12).trim();
   }
 
-  const stu_id = parseInt(username);
+  const stu_id = username;
 
   if (stu_id) {
     const user = await db
@@ -74,7 +74,7 @@ export default defineEventHandler(async (event) => {
         adminPassword: config.ldap_password,
         userSearchBase: config.ldap_user_search_base,
         usernameAttribute: "sAMAccountName",
-        username: "it" + user.student_id,
+        username: user.student_id,
         userPassword: password,
         attributes: ["dn", "sn", "cn"],
       };

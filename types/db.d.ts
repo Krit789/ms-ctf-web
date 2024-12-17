@@ -13,21 +13,10 @@ export type Role = "ADMIN" | "STUDENT" | "VIEWER";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
-export interface _PrismaMigrations {
-  applied_steps_count: Generated<number>;
-  checksum: string;
-  finished_at: Timestamp | null;
-  id: string;
-  logs: string | null;
-  migration_name: string;
-  rolled_back_at: Timestamp | null;
-  started_at: Generated<Timestamp>;
-}
-
 export interface Answers {
   answer: string;
   answer_id: Generated<number>;
-  for_student_id: number | null;
+  for_student_id: string | null;
   question_id: number;
 }
 
@@ -45,7 +34,7 @@ export interface Submissions {
   created_on: Generated<Timestamp>;
   flag: string;
   question_id: number;
-  student_id: number;
+  student_id: string;
   submission_id: Generated<number>;
 }
 
@@ -56,11 +45,10 @@ export interface Users {
   lastname: string;
   password: string | null;
   role: Generated<Role>;
-  student_id: number;
+  student_id: string;
 }
 
 export interface DB {
-  _prisma_migrations: _PrismaMigrations;
   Answers: Answers;
   Questions: Questions;
   Submissions: Submissions;

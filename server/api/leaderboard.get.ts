@@ -29,7 +29,7 @@ export default defineEventHandler(async (event): Promise<LeaderboardResponse> =>
   }
 
   // Group submissions by student
-  const submissionsByStudent = new Map<number, SubmissionWithPoints[]>()
+  const submissionsByStudent = new Map<string, SubmissionWithPoints[]>()
   for (const questionSubmissions of submissionsByQuestion.values()) {
     for (const submission of questionSubmissions) {
       const studentSubmissions = submissionsByStudent.get(submission.student_id) || []
