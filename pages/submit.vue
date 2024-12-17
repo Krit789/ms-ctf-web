@@ -105,10 +105,10 @@ fetchUserRank()
         <span class="font-bold">Your Score</span><br />
         <span class="text-5xl" v-if="!isRankLoading">{{ currentScore }}</span>
         <Skeleton class="w-full h-12 rounded-full" v-else />
-
       </div>
     </div>
 
+  <CtfPacketFile></CtfPacketFile>
     <div class="flex flex-col gap-4 w-full justify-center items-center">
       <div class="flex flex-col gap-4 max-w-[560px] md:w-[560px] w-full" v-if="!isQuestionLoading">
         <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" @refresh-question="handleEmit" :question_id="question.question_id"

@@ -34,7 +34,7 @@ const props = defineProps({
       // Add more specific validation for the submission object if needed
       return typeof value === 'object' &&
         value !== null && 'correct' in value && typeof value.correct === 'boolean' &&
-        'created_on' in value && typeof value.created_on === 'string' &&
+        'created_on' in value && (typeof value.created_on === 'string' || value.created_on === null) &&
         'submission_rank' in value && typeof value.submission_rank === 'number' && 'points_with_bonus' in value && typeof value.points_with_bonus === 'number';
     }
   }
@@ -48,16 +48,18 @@ const emit = defineEmits(['refresh-question'])
 
 const submitFlag = async () => {
   isSubmitting.value = true;
-  await $fetch<{ message: string, correct?: boolean, submission_order?: number }>('/api/flag/submit', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${tokenCookie.value}`
-    },
-    body: JSON.stringify({
-      question_id: props.question_id,
-      flag: flag.value
-    }),
-  }).then(async (res) => {
+  try {
+    const res = await $fetch<{ message: string, correct?: boolean, submission_order?: number }>('/api/flag/submit', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${tokenCookie.value}`
+      },
+      body: JSON.stringify({
+        question_id: props.question_id,
+        flag: flag.value
+      }),
+    });
+
     const toastHTML = `<strong>Flag Submitted</strong>\n${res.message}`;
     toast(toastHTML, {
       type: res.correct ? toast.TYPE.SUCCESS : toast.TYPE.ERROR,
@@ -71,9 +73,9 @@ const submitFlag = async () => {
     if (res.correct) {
       emit('refresh-question');
     }
-  }).catch((err) => {
-    const toastHTML = `<strong>Flag Submission Failure</strong>\n${err.message}`;
-    console.error(err);
+  } catch (error) {
+    const toastHTML = `<strong>Flag Submission Failure</strong>\n${(error && typeof error === 'object' && "data" in error && error.data && typeof error.data === 'object' && "message" in error.data) ? error.data?.message || error.message : ""}`;
+    console.error(error);
     toast.error(toastHTML, {
       transition: toast.TRANSITIONS.SLIDE,
       position: toast.POSITION.TOP_RIGHT,
@@ -81,17 +83,17 @@ const submitFlag = async () => {
       closeOnClick: true,
       dangerouslyHTMLString: true,
     });
-  }).finally(() => {
-    flag.value = ''
+  } finally {
+    flag.value = '';
     isSubmitting.value = false;
-  });
+  }
 };
 </script>
 
 <template>
   <div class="flex flex-col gap-2 bg-white border-zinc-200 border-2 p-6 shadow-xl rounded-md">
     <h3 class="text-2xl font-semibold">{{ question_title }}</h3>
-    <p class="text-lg">{{ question_description }}</p>
+    <p class="text-lg break-keep">{{ question_description }}</p>
     <hr />
     <div class="grid items-center w-full gap-1.5">
       <form @submit.prevent="submitFlag" class="flex flex-col gap-4  bg-zinc-100/50 rounded-md"

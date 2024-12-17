@@ -1,5 +1,5 @@
 export interface User {
-  student_id: number
+  student_id: string
   firstname: string
   lastname: string
   role: "ADMIN" | "STUDENT" | "VIEWER"
