@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 WORKDIR /app
 COPY . .
-RUN npm install -g
+RUN npm install -g pnpm
 RUN pnpm install
 RUN pnpm build
 
