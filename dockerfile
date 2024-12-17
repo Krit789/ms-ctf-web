@@ -15,4 +15,4 @@ ENV NUXT_LDAP_USER_SEARCH_BASE=
 ENV NUXT_JWT_SECRET=
 
 EXPOSE 3000
-CMD ["node", "./app/.output/server/index.mjs"]
+CMD ["node", "./.output/server/index.mjs"]
