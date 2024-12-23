@@ -21,12 +21,15 @@ export interface Answers {
 }
 
 export interface Questions {
+  begin_time: Timestamp | null;
   created_on: Generated<Timestamp>;
+  end_time: Timestamp | null;
   global_answer: boolean;
   points: number;
   question_description: string;
   question_id: Generated<number>;
   question_title: string;
+  tournament_id: number;
 }
 
 export interface Submissions {
@@ -36,6 +39,14 @@ export interface Submissions {
   question_id: number;
   student_id: string;
   submission_id: Generated<number>;
+}
+
+export interface Tournaments {
+  begin_time: Generated<Timestamp>;
+  description: string | null;
+  end_time: Timestamp | null;
+  name: string;
+  t_id: Generated<number>;
 }
 
 export interface Users {
@@ -52,5 +63,6 @@ export interface DB {
   Answers: Answers;
   Questions: Questions;
   Submissions: Submissions;
+  Tournaments: Tournaments;
   Users: Users;
 }

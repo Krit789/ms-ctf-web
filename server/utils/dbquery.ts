@@ -17,13 +17,14 @@ export const getAllUsers = async () => {
     .execute()
 }
 
-export const getCorrectSubmissions = async () => {
+export const getCorrectSubmissions = async (tid: number| null) => {
   return await db
     .selectFrom("Submissions")
     .leftJoin("Questions", "Submissions.question_id", "Questions.question_id")
     .leftJoin("Users", "Submissions.student_id", "Users.student_id")
     .where("Submissions.correct", "=", true)
     .where('Users.role', '=', 'STUDENT')
+    .$if(tid !== null, (qb) => qb.where("Questions.tournament_id", "=", tid))
     .select([
       "Submissions.student_id",
       "Submissions.created_on",

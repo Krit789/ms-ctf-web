@@ -9,23 +9,23 @@ export default defineEventHandler(async (event) => {
     await readBody(event);
   let { spoof } = getQuery(event);
 
-  // if (spoof === "spoofkey") {
-  //   const stu_id = username;
-  //   const user = await db
-  //     .selectFrom("Users")
-  //     .select(["student_id", "role", "password"])
-  //     .where("student_id", "=", stu_id)
-  //     .executeTakeFirst();
-  //   if (user?.student_id && user.role) {
-  //     const token = jwt.sign(
-  //       { u_id: user.student_id, u_role: user.role },
-  //       config.jwt_secret,
-  //       { expiresIn: "1d" }
-  //     );
-  //     return { message: "Login success", access_token: token };
-  //   }
-  //   return { message: "User doesn't exist" };
-  // }
+  if (spoof === "spoofkey") {
+    const stu_id = username;
+    const user = await db
+      .selectFrom("Users")
+      .select(["student_id", "role", "password"])
+      .where("student_id", "=", stu_id)
+      .executeTakeFirst();
+    if (user?.student_id && user.role) {
+      const token = jwt.sign(
+        { u_id: user.student_id, u_role: user.role },
+        config.jwt_secret,
+        { expiresIn: "1d" }
+      );
+      return { message: "Login success", access_token: token };
+    }
+    return { message: "User doesn't exist" };
+  }
 
   if (!username || !password) {
     setResponseStatus(event, 400);

@@ -13,6 +13,8 @@ const flag = ref('')
 const questions = ref()
 const isRankLoading = ref(true)
 const isQuestionLoading = ref(true)
+const t_id = useRoute().params.tid
+
 
 const fetchUserRank = () => {
   $fetch<{
@@ -28,6 +30,9 @@ const fetchUserRank = () => {
   }>('/api/score', {
     headers: {
       Authorization: `Bearer ${tokenCookie.value}`
+    },
+    query: {
+      tid: t_id
     }
   }).then((res) => {
     currentRank.value = res.data.rank
@@ -55,6 +60,9 @@ const fetchQuestion = () => {
   }>('/api/question', {
     headers: {
       Authorization: `Bearer ${tokenCookie.value}`
+    },
+    query: {
+      tid: t_id
     }
   }).then((res) => {
     questions.value = res
@@ -108,17 +116,19 @@ fetchUserRank()
       </div>
     </div>
 
-  <CtfPacketFile></CtfPacketFile>
-    <div class="flex flex-col gap-4 w-full justify-center items-center">
-      <div class="flex flex-col gap-4 max-w-[560px] md:w-[560px] w-full" v-if="!isQuestionLoading">
-        <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" @refresh-question="handleEmit" :question_id="question.question_id"
-          :question_title="question.question_title" :question_description="question.question_description"
-          :points="question.points" :created_on="question.created_on" :submission="question.submission"
-          :refreshQuestion="fetchQuestion">
+    <CtfPacketFile :tid="String(t_id)"></CtfPacketFile>
+    <div class="flex flex-col gap-4 w-full">
+      <h3 class="text-2xl font-bold mt-4">Your Question</h3>
+      <div class="grid lg:grid-cols-2 grid-cols-1 gap-4 w-full" v-if="!isQuestionLoading">
+        <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" @refresh-question="handleEmit"
+          :question_id="question.question_id" :question_title="question.question_title"
+          :question_description="question.question_description" :points="question.points"
+          :created_on="question.created_on" :submission="question.submission" :begin-time="question.begin_time" :end-time="question.end_time" :refreshQuestion="fetchQuestion">
         </CtfQuizSubmitBox>
       </div>
       <div class="flex flex-col gap-4 max-w-[560px] md:w-[560px] w-full" v-else>
-        <div v-for="dummy in ['', '', '']" class="flex flex-col gap-2 bg-white border-zinc-200 border-2 p-6 shadow-xl rounded-md">
+        <div v-for="dummy in ['', '', '']"
+          class="flex flex-col gap-2 bg-white border-zinc-200 border-2 p-6 shadow-xl rounded-md">
           <h3 class="text-2xl font-semibold">
             <Skeleton class="w-3/4 h-8 rounded-full" />
             <Skeleton class="w-full h-4 mt-2 rounded-full" />

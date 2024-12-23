@@ -50,6 +50,9 @@ const currentPage = ref(1)
 const lastUpdated = ref(Date.now())
 const isLoading = ref(false)
 const tokenCookie = useCookie('access_token')
+const t_id = useRoute().params.tid
+
+
 const fetchLiveLog = (page: number) => {
   if (!page) {
     page = currentPage.value
@@ -64,7 +67,8 @@ const fetchLiveLog = (page: number) => {
       },
       params: {
         page: page,
-        limit: 10
+        limit: 10,
+        tid: t_id
       }
     }
   )

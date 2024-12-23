@@ -115,6 +115,11 @@ function mapSubmissionsToQuestions(
 }
 
 export default defineEventHandler(async (event: H3Event): Promise<QuestionResponse> => {
+
+  const { tid: tournament_id } = getQuery(event);
+
+  const tid = tournament_id ? Number(tournament_id) : null;
+
   // Get all questions
   const questions = await db
     .selectFrom("Questions")
@@ -124,7 +129,10 @@ export default defineEventHandler(async (event: H3Event): Promise<QuestionRespon
       "question_description",
       "points",
       "created_on",
+      "Questions.begin_time",
+      "Questions.end_time"
     ])
+    .$if(tid !== null, (qb) => qb.where("tournament_id", "=", tid))
     .orderBy("question_id", "asc")
     .execute()
 
@@ -142,8 +150,11 @@ export default defineEventHandler(async (event: H3Event): Promise<QuestionRespon
   if (event.context.role !== "ADMIN") {
     submissions = await db
       .selectFrom("Submissions")
-      .select(['question_id', 'correct', 'created_on'])
+      .innerJoin("Questions", "Submissions.question_id", "Questions.question_id")
+      .where("Questions.tournament_id", "=", tid)
+      .select(['Submissions.question_id', 'correct', 'Submissions.created_on'])
       .where("student_id", "=", event.context.user_id)
+      .where("Submissions.question_id", 'is not', null)
       .execute()
 
     // Calculate submission ranks for correct submissions

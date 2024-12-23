@@ -5,12 +5,12 @@ export default defineEventHandler((event) => {
   const config = useRuntimeConfig();
   const excludePaths = ["/api/auth/login"];
 
-  if (excludePaths.includes(event.path) || !event.path.startsWith("/api")) {
+  if (excludePaths.includes(event.path.split("?")[0]) || !event.path.startsWith("/api")) {
     return;
   }
   if (!headers?.authorization) {
     setResponseStatus(event, 401);
-    return { message: "Unauthorized" };
+    return { message: "Unauthorized", "path": event.path };
   }
   const token = headers.authorization.split(" ")[1] || null;
   if (token) {

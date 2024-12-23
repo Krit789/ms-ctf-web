@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { Skeleton } from '@/components/ui/skeleton'
-import type { ProfileResponse } from '~/server/api/profile/[userid].get'
 
 const route = useRoute()
 
 const cookieToken = useCookie('access_token')
 const student_id = route.params.uid
+const t_id = route.params.tid
 const studentUser = ref<ProfileResponse['user']>()
 const studentSubmission = ref<ProfileResponse['submissions']>()
 
@@ -20,6 +20,9 @@ const fetchStudent = async () => {
     headers: {
       Authorization: `Bearer ${cookieToken.value}`,
     },
+    params: {
+      tid: t_id
+    }
   })
     .then((res) => {
       studentUser.value = res.user;
@@ -46,7 +49,8 @@ const fetchUserRank = () => {
     }
   }>('/api/score', {
     params: {
-      student_id: student_id
+      student_id: student_id,
+      tid: t_id
     },
     headers: {
       Authorization: `Bearer ${cookieToken.value}`

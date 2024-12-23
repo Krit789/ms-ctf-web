@@ -26,6 +26,9 @@ export interface ProfileResponse {
 
 export default defineEventHandler(async (event: H3Event): Promise<ProfileResponse> => {
   const student_id = getRouterParam(event, 'userid')
+  const { tid: tournament_id } = getQuery(event);
+  const tid = tournament_id ? Number(tournament_id) : null;
+
 
   if (!student_id) {
     throw createError({
@@ -50,6 +53,7 @@ export default defineEventHandler(async (event: H3Event): Promise<ProfileRespons
         "question_description",
         "Questions.points as base_points",
       ])
+      .$if(tid !== null, (qb) => qb.where("Questions.tournament_id", "=", tid))
       .where("correct", "=", true)
       .orderBy("Submissions.created_on", "asc")
       .execute()

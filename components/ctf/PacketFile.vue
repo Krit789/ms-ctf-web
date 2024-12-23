@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import { ArrowDownToLine } from 'lucide-vue-next'
+defineProps({
+  tid: {
+    type: String,
+    required: true
+  }
+})
+
 const userState = useUserState()
+
 const data = ref([
   {
     "for_student_id": "66070001",
@@ -523,11 +532,17 @@ data.value.forEach((i) => {
 
 <template>
 <div class="flex flex-col gap-4">
-  <h3 class="text-xl">Your CTF File</h3>
-  <div v-if="filteredData">
-    <div v-for="i, index in filteredData.answers" :key="index" class="flex flex-col gap-4 border-2 p-4 rounded-md">
-      <NuxtLink :to="`/ctf/ctf01-${index}${i}.pka`" target="_blank" class="hover:underline text-blue-500"> Problem {{ index }} Download</NuxtLink>
+  <h3 class="text-2xl font-bold">Your CTF File</h3>
+  <div v-if="filteredData" class="flex flex-wrap gap-4">
+    <div v-for="i, index in filteredData.answers" :key="index" class="flex flex-row gap-x-2 border-2 p-4 rounded-md shadow-md">
+      Problem {{ index }}
+      <NuxtLink :to="`/ctf/ctf0${tid}-${index}${i}.pka`" target="_blank" class="hover:underline text-blue-500"> 
+        <ArrowDownToLine />
+      </NuxtLink>
     </div>
   </div>
+  <div v-else>
+    <p>CTF File not found (for your ID)</p>
+  </div>  
 </div>
 </template>

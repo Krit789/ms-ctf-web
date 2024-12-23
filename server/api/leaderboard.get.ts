@@ -5,10 +5,15 @@ import { calculatePointsForSubmission, sortUserScores, calculateUserStats } from
 import type { UserScore, LeaderboardResponse, SubmissionWithPoints } from '~/types/score'
 
 export default defineEventHandler(async (event): Promise<LeaderboardResponse> => {
+
+  const { tid: tournament_id } = getQuery(event);
+
+  const tid = tournament_id ? Number(tournament_id) : null;
+
   // Fetch data in parallel
   const [users, submissions] = await Promise.all([
     getStudentUsers(),
-    getCorrectSubmissions(),
+    getCorrectSubmissions(tid),
   ])
 
   // Create a map of question submissions for efficient lookup

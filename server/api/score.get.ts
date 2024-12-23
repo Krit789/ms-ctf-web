@@ -16,11 +16,14 @@ export default defineEventHandler(async (event: H3Event): Promise<ScoreResponse>
       message: "Unauthorized",
     })
   }
+  let { tid } = getQuery(event);
+
+  tid = tid ? Number(tid) : null;
 
   // Fetch data in parallel
   const [users, submissions] = await Promise.all([
     event.context.u_role === 'STUDENT' ? getStudentUsers() : getAllUsers(),
-    getCorrectSubmissions(),
+    getCorrectSubmissions(tid),
   ])
 
   // Create a map of question submissions for efficient lookup

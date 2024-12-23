@@ -6,6 +6,8 @@ const lastUpdated = ref(Date.now());
 const isLoading = ref(false);
 const flashRows = ref<number[]>([]); // Array to store row indices to flash
 const cookieToken = useCookie('access_token');
+const t_id = useRoute().params.tid
+
 
 const fetchLeaderboard = () => {
   isLoading.value = true;
@@ -20,7 +22,10 @@ const fetchLeaderboard = () => {
   }>('/api/leaderboard', {
     headers: {
       Authorization: `Bearer ${cookieToken.value}`,
-    },  
+    },
+    query: {
+      tid: t_id
+    }
   })
     .then((res) => {
       const newFlashRows: number[] = [];
@@ -86,7 +91,7 @@ onUnmounted(() => {
         <TableRow>
           <TableHead>Rank</TableHead>
           <TableHead>Student ID</TableHead>
-          <TableHead>Firsname</TableHead>
+          <TableHead>Firstname</TableHead>
           <TableHead>Lastname</TableHead>
           <TableHead>Score</TableHead>
         </TableRow>
@@ -97,7 +102,7 @@ onUnmounted(() => {
           :class="{ 'flash-row': flashRows.includes(indx) }"
         >
           <TableCell>{{ indx + 1 }}</TableCell>
-          <TableCell><NuxtLink :to="`/profile/${student.student_id}`" class="underline hover:text-cyan-600 transition-all">{{ student.student_id }}</NuxtLink></TableCell>
+          <TableCell><NuxtLink :to="`/tournaments/${t_id}/profile/${student.student_id}`" class="underline hover:text-cyan-600 transition-all">{{ student.student_id }}</NuxtLink></TableCell>
           <TableCell>{{ student.firstname }}</TableCell>
           <TableCell>{{ student.lastname }}</TableCell>
           <TableCell>{{ student.totalPoints }}</TableCell>

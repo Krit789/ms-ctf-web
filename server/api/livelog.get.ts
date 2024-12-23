@@ -3,7 +3,9 @@ import db from "~/db";
 import { sql } from "kysely";
 
 export default defineEventHandler(async (event) => {
-  let { page, limit } = getQuery(event);
+  let { page, limit, tid } = getQuery(event);
+
+  tid = tid ? Number(tid) : null;
 
   const ilimit = Number(limit || 10);
   const ipage = Number(page || 1);
@@ -17,6 +19,8 @@ export default defineEventHandler(async (event) => {
     db
       .selectFrom("Submissions")
       .leftJoin("Users", "Submissions.student_id", "Users.student_id")
+      .leftJoin("Questions", "Submissions.question_id", "Questions.question_id")
+      .$if(tid !== null, (qb) => qb.where("Questions.tournament_id", "=", tid))
       .$if(event.context.u_role === 'STUDENT', (qb) => qb.where('Users.role', '=', 'STUDENT'))
       .where('Users.role', '=', 'STUDENT')
       .select(sql<number>`count(*)`.as("total"))
@@ -26,6 +30,7 @@ export default defineEventHandler(async (event) => {
       .selectFrom("Submissions")
       .leftJoin("Questions", "Submissions.question_id", "Questions.question_id")
       .leftJoin("Users", "Submissions.student_id", "Users.student_id")
+      .$if(tid !== null, (qb) => qb.where("Questions.tournament_id", "=", tid))
       .where('Users.role', '=', 'STUDENT')
       .$if(event.context.u_role === 'STUDENT', (qb) => qb.where('Users.role', '=', 'STUDENT'))
       .select([

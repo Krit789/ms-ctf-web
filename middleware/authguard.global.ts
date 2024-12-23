@@ -22,7 +22,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     })
   }
 
-  const excludedRoutes = ['/login', '/']
+  if (to.path === '/login' && userState.value !== null) {
+    return navigateTo('/tournaments')
+  }
+
+  const excludedRoutes = ['/login', '/test', '/']
   if (!excludedRoutes.includes(to.path)) {
     if (userState.value === null) {
       return navigateTo('/login')

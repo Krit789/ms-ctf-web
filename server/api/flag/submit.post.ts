@@ -19,13 +19,23 @@ export default defineEventHandler(async (event) => {
 
   const question = await db
     .selectFrom("Questions")
-    .select(["question_id", "global_answer"])
+    .select(["question_id", "global_answer", "Questions.begin_time", "Questions.end_time"])
     .where("question_id", "=", question_id)
     .executeTakeFirst();
 
   if (!question) {
     setResponseStatus(event, 400);
     return { message: "Question not found" };
+  }
+
+  if (question.begin_time && question.begin_time > new Date()) {
+    setResponseStatus(event, 400);
+    return { message: "Too Early: Question not started yet" };
+  }
+
+  if (question.end_time && question.end_time < new Date()) {
+    setResponseStatus(event, 400);
+    return { message: "Too Late: Question has already ended" };
   }
 
   const checkSubmission = await db

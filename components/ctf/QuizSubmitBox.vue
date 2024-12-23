@@ -27,6 +27,14 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  beginTime: {
+    type: String || null,
+    required: true,
+  },
+  endTime: {
+    type: String || null,
+    required: true,
+  },
   submission: {
     type: Object, // You might want to define a more specific type for submission if possible
     required: true,
@@ -91,39 +99,51 @@ const submitFlag = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2 bg-white border-zinc-200 border-2 p-6 shadow-xl rounded-md">
-    <h3 class="text-2xl font-semibold">{{ question_title }}</h3>
-    <p class="text-lg break-keep">{{ question_description }}</p>
-    <hr />
-    <div class="grid items-center w-full gap-1.5">
-      <form @submit.prevent="submitFlag" class="flex flex-col gap-4  bg-zinc-100/50 rounded-md"
-        v-if="!submission.correct">
-        <Label for="flag">Flag<span class="text-red-500">*</span></Label>
-        <Input v-model="flag" id="flag" required />
-        <Button type="submit" :disabled="!flag || isSubmitting">{{ isSubmitting ? '⏳ Submitting' : 'Submit' }}</Button>
-      </form>
-      <span v-if="submission.correct">
-        <div variant="ghost"
-          class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 bg-gradient-to-tr from-green-300 to-green-600 text-white select-none">
-          Passed</div>
-        <div class="flex flex-row gap-x-4 text-sm mt-2 justify-center items-center">
-          <div class="flex flex-row gap-x-2 text-sm">
-            <Clock :size='18' />
-            {{ new Date(submission.created_on).toLocaleString('th', {
-              dateStyle: 'short',
-              timeStyle: 'medium'
-            }) }}
+  <div class="flex flex-col justify-between gap-2 bg-white border-zinc-200 border-2 p-6 shadow-xl rounded-md">
+    <div>
+      <div v-if="endTime && new Date(endTime) < new Date()" class="bg-red-200 p-2 rounded-md text-center font-bold">
+        Submission has ended
+      </div>
+      <div v-else-if="beginTime && new Date() < new Date(beginTime)"
+        class="bg-red-200 p-2 rounded-md text-center font-bold">
+        Submission has not started yet
+      </div>
+      <h3 class="text-2xl font-semibold">{{ question_title }}</h3>
+      <p class="text-lg break-keep">{{ question_description }}</p>
+      <hr />
+    </div>
+    <div>
+      <div class="grid items-center w-full gap-1.5">
+        <form @submit.prevent="submitFlag" class="flex flex-col gap-4  bg-zinc-100/50 rounded-md"
+          v-if="!submission.correct">
+          <Label for="flag">Flag<span class="text-red-500">*</span></Label>
+          <Input v-model="flag" id="flag" required />
+          <Button type="submit" :disabled="!flag || isSubmitting">{{ isSubmitting ? '⏳ Submitting' : 'Submit'
+            }}</Button>
+        </form>
+        <span v-if="submission.correct">
+          <div variant="ghost"
+            class="w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 bg-gradient-to-tr from-green-300 to-green-600 text-white select-none">
+            Passed</div>
+          <div class="flex flex-row gap-x-4 text-sm mt-2 justify-center items-center">
+            <div class="flex flex-row gap-x-2 text-sm">
+              <Clock :size='18' />
+              {{ new Date(submission.created_on).toLocaleString('th', {
+                dateStyle: 'short',
+                timeStyle: 'medium'
+              }) }}
+            </div>
+            <div class="flex flex-row gap-x-2 text-sm">
+              <Medal :size='18' />Rank
+              {{ submission.submission_rank }}
+            </div>
+            <div class="flex flex-row gap-x-2 text-sm">
+              <Tally5 :size='18' />Score
+              {{ submission.points_with_bonus }}
+            </div>
           </div>
-          <div class="flex flex-row gap-x-2 text-sm">
-            <Medal :size='18' />Rank
-            {{ submission.submission_rank }}
-          </div>
-          <div class="flex flex-row gap-x-2 text-sm">
-            <Tally5 :size='18' />Score
-            {{ submission.points_with_bonus }}
-          </div>
-        </div>
-      </span>
+        </span>
+      </div>
     </div>
   </div>
 </template>
