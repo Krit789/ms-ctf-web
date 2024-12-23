@@ -536,7 +536,7 @@ data.value.forEach((i) => {
   <div v-if="filteredData" class="flex flex-wrap gap-4">
     <div v-for="i, index in filteredData.answers" :key="index" class="flex flex-row gap-x-2 border-2 p-4 rounded-md shadow-md">
       Problem {{ index }}
-      <NuxtLink :to="`/ctf/ctf0${tid}-${index}${i}.pka`" target="_blank" class="hover:underline text-blue-500"> 
+      <NuxtLink :to="`/ctf/ctf0${tid}-${index}${i}.pka`" target="_blank" class="hover:underline text-blue-500" external> 
         <ArrowDownToLine />
       </NuxtLink>
     </div>
