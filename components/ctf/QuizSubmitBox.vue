@@ -143,6 +143,17 @@ const submitFlag = async () => {
             </div>
           </div>
         </span>
+        <div class="flex flex-row bg-gray-100 p-2 gap-x-4 rounded-md">
+          <span v-if="beginTime">
+            <span class="font-bold">Begin Time:</span><br>
+            {{ beginTime ? new Date(beginTime).toLocaleString('th') : "Before Mankind"
+            }}
+          </span>
+          <span v-if="endTime">
+            <span class="font-bold">End Time:</span><br>
+            {{ endTime ? new Date(endTime).toLocaleString('th') : "Future Life" }}
+          </span>
+        </div>
       </div>
     </div>
   </div>

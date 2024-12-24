@@ -542,7 +542,7 @@ if (props.tid === '1') {
     }
   })
 } else if (props.tid === '2') {
-  filteredData.value = ref(
+  filteredData.value = 
     {
     "answers": {
       "1": "",
@@ -550,7 +550,6 @@ if (props.tid === '1') {
       "3": "",
     }
   }
-)
 }
 // data.value.forEach((i) => {
 //   if (i.for_student_id === userState.value?.student_id) {

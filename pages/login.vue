@@ -13,7 +13,7 @@ const login = (username: string, password: string) => {
     body: JSON.stringify({ username, password }),
   })
     .then(async (res) => {
-      const toastHTML = `<strong>Login Success</strong>\n${res.message}`;
+      const toastHTML = `<strong>Login Success</strong>\n${res.messasge}`;
       toast.success(toastHTML, {
         transition: toast.TRANSITIONS.SLIDE,
         position: toast.POSITION.TOP_RIGHT,
@@ -29,7 +29,7 @@ const login = (username: string, password: string) => {
       }).then((userdata) => 
         userState.value = userdata.user
       )
-      await navigateTo('/submit', { replace: true })
+      await navigateTo('/tournaments', { replace: true })
     })
     .catch((err) => {
       const toastHTML = `<strong>Login Failure</strong>\nYour username or password is incorrect. Please try again.`;
