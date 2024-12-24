@@ -26,6 +26,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/tournaments')
   }
 
+  if (to.path === '/tournaments/create' && userState.value?.role !== 'ADMIN') {
+    return navigateTo('/tournaments')
+  }
+
   const excludedRoutes = ['/login', '/test', '/']
   if (!excludedRoutes.includes(to.path)) {
     if (userState.value === null) {

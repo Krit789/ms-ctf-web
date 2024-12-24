@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { toast, type ToastOptions } from 'vue3-toastify';
+
 import { Flag, Crown, Logs } from 'lucide-vue-next';
 const t_id = useRoute().params.tid
 const tournament_data = ref()
 const tokenCookie = useCookie('access_token')
-
+const userState = useUserState()
 
 const fetchTournaments = () => {
   $fetch('/api/tournaments', {
@@ -16,14 +18,22 @@ const fetchTournaments = () => {
   })
     .then((res) => {
       tournament_data.value = res.tournament
+      if (tournament_data.value.begin_time && new Date(tournament_data.value.begin_time) > new Date()) {
+        if (userState.value?.role !== 'ADMIN') {
+          toast.info('Tournament has not started yet. ', { autoClose: 5000 })
+          navigateTo('/tournaments', { replace: true })
+        } else {
+            toast.info('Tournament has not started yet. However, as an admin, you can access this page.', { autoClose: 10000 })
+        }
+      }
     })
     .catch((err) => {
       console.error(err)
+      navigateTo('/tournaments', { replace: true })
     })
 }
 
 fetchTournaments()
-
 
 </script>
 
@@ -33,14 +43,25 @@ fetchTournaments()
       <div>
         <h2 class="text-left mt-2 scroll-m-20 pb-2 text-4xl font-bold tracking-tight transition-colors first:mt-0">
           {{ tournament_data?.name }}
-          </h2>
+        </h2>
+        <div v-if="tournament_data" class="flex flex-row bg-gray-100 p-2 gap-x-4 rounded-md">
+          <span>
+            <span class="font-bold">Begin Time:</span>
+            {{ tournament_data.begin_time ? new Date(tournament_data.begin_time).toLocaleString('th') : "Before Mankind"
+            }}
+          </span>
+          <span>
+            <span class="font-bold">End Time:</span>
+            {{ tournament_data.end_time ? new Date(tournament_data.end_time).toLocaleString('th') : "Future Life" }}
+          </span>
+        </div>
         <h4 class="font-bold text-2xl mt-2">Description</h4>
         <p class="text-lg">
           {{ tournament_data?.description ? tournament_data?.description : "Not given" }}
         </p>
       </div>
       <div class="text-right">
-
+        <NuxtLink v-if="userState?.role === 'ADMIN'" :to='`/tournaments/${t_id}/edit`'><Button>Edit</Button></NuxtLink>
       </div>
     </div>
 

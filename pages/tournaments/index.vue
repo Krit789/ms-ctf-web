@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import { Plus, LogIn } from 'lucide-vue-next';
 
 const tournaments_res = ref()
 const tokenCookie = useCookie('access_token')
+const userState = useUserState()
 
 const fetchTournaments = () => {
   $fetch('/api/tournaments', {
     headers: {
       Authorization: `Bearer ${tokenCookie.value}`
     },
+    query: {
+      tid: '*'
+    }
   })
     .then((res) => {
       tournaments_res.value = res
@@ -30,6 +35,7 @@ fetchTournaments()
         <p class="text-2xl">CTF.IT</p>
       </div>
       <div class="text-right">
+        <NuxtLink v-if="userState?.role === 'ADMIN'" to="/tournaments/create"><Button><Plus /> Create</Button></NuxtLink>
       </div>
     </div>
     <Table class="text-2xl">
@@ -47,7 +53,7 @@ fetchTournaments()
           <TableCell>{{ t.begin_time ? new Date(t.begin_time).toLocaleString('th') : "Before Mankind" }}</TableCell>
           <TableCell>{{ t.end_time ? new Date(t.end_time).toLocaleString('th') : "Future Life" }}</TableCell>
           <TableCell>
-            <NuxtLink :to="`/tournaments/${t.t_id}`"><Button class="bg-emerald-400">Enter</Button>
+            <NuxtLink :to="`/tournaments/${t.t_id}`"><Button class="bg-emerald-400 hover:bg-emerald-700"><LogIn />Enter</Button>
             </NuxtLink>
           </TableCell>
         </TableRow>

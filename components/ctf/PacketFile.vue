@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ArrowDownToLine } from 'lucide-vue-next'
-defineProps({
+const props = defineProps({
   tid: {
     type: String,
     required: true
@@ -9,7 +9,7 @@ defineProps({
 
 const userState = useUserState()
 
-const data = ref([
+const data_1 = ref([
   {
     "for_student_id": "66070001",
     "answers": {
@@ -519,15 +519,44 @@ const data = ref([
       "4": "a",
       "5": "a"
     }
+  },
+  ,
+  {
+    "for_student_id": "65070030",
+    "answers": {
+      "1": "a",
+      "2": "b",
+      "3": "a",
+      "4": "a",
+      "5": "a"
+    }
   }
 ])
+
 const filteredData = ref()
 
-data.value.forEach((i) => {
-  if (i.for_student_id === userState.value?.student_id) {
-    filteredData.value = i
+if (props.tid === '1') {
+  data_1.value.forEach((i) => {
+    if (i.for_student_id === userState.value?.student_id) {
+      filteredData.value = i
+    }
+  })
+} else if (props.tid === '2') {
+  filteredData.value = ref(
+    {
+    "answers": {
+      "1": "",
+      "2": "",
+      "3": "",
+    }
   }
-})
+)
+}
+// data.value.forEach((i) => {
+//   if (i.for_student_id === userState.value?.student_id) {
+//     filteredData.value = i
+//   }
+// })
 </script>
 
 <template>

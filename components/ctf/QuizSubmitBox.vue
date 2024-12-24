@@ -28,11 +28,11 @@ const props = defineProps({
     required: true,
   },
   beginTime: {
-    type: String || null,
+    type: String,
     required: true,
   },
   endTime: {
-    type: String || null,
+    type: String,
     required: true,
   },
   submission: {

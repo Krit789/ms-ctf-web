@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Skeleton } from '@/components/ui/skeleton'
+import type { ProfileResponse } from '~/server/api/profile/[userid].get'
 
 const route = useRoute()
 

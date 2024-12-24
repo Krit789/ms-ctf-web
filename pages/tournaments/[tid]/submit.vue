@@ -51,10 +51,13 @@ const fetchQuestion = () => {
       question_description: string;
       points: number;
       created_on: string;
+      begin_time: string | null;
+      end_time: string | null;
       submission: {
         correct: boolean;
-        created_on: string;
-        submission_order: number;
+        created_on: string | null;
+        submission_rank: number;
+        points_with_bonus: number;
       }[]
     }[];
   }>('/api/question', {
@@ -120,7 +123,7 @@ fetchUserRank()
     <div class="flex flex-col gap-4 w-full">
       <h3 class="text-2xl font-bold mt-4">Your Question</h3>
       <div class="grid lg:grid-cols-2 grid-cols-1 gap-4 w-full" v-if="!isQuestionLoading">
-        <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" @refresh-question="handleEmit"
+        <CtfQuizSubmitBox v-for="question in questions?.questionWithSubmission" :key="question.question_id" @refresh-question="handleEmit"
           :question_id="question.question_id" :question_title="question.question_title"
           :question_description="question.question_description" :points="question.points"
           :created_on="question.created_on" :submission="question.submission" :begin-time="question.begin_time" :end-time="question.end_time" :refreshQuestion="fetchQuestion">

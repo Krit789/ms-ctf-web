@@ -29,8 +29,7 @@ export default defineEventHandler(async (event) => {
       message: "Success",
       tournament,
     };
-
-  } else {
+  } else if (tournament_id === "*") {
     const [tournament] = await Promise.all([
       db
         .selectFrom("Tournaments")
@@ -45,6 +44,11 @@ export default defineEventHandler(async (event) => {
     return {
       message: "Success",
       tournament,
+    };
+  } else {
+    setResponseStatus(event, 400);
+    return {
+      message: "Invalid tournament id",
     };
   }
 });
