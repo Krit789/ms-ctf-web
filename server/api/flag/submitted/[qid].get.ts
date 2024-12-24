@@ -3,31 +3,25 @@ import db from "~/db";
 export default defineEventHandler(async (event) => {
   const question_id = getRouterParam(event, "qid");
 
+  let { tid } = getQuery(event);
+  tid = tid ? Number(tid) : null;
+
   if (!question_id || !parseInt(question_id)) {
     setResponseStatus(event, 400);
     return { message: "Invalid question id" };
   }
-
-  // const question = await prisma.questions.findFirst({
-  //   where: {
-  //     question_id: parseInt(question_id),
-  //   },
-  //   select: {
-  //     question_id: true,
-  //     question_title: true,
-  //     question_description: true,
-  //   },
-  // });
 
   const [question, submissions] = await Promise.all([
     db
       .selectFrom("Questions")
       .select(["question_id", "question_title", "question_description"])
       .where("question_id", "=", parseInt(question_id))
+      .$if(tid !== null, (query) => query.where("Questions.tournament_id", "=", tid))
       .executeTakeFirst(),
     db
       .selectFrom("Submissions")
       .leftJoin("Users", "Submissions.student_id", "Users.student_id")
+      .leftJoin("Questions", "Submissions.question_id", "Questions.question_id")
       .select([
         "Submissions.student_id",
         "submission_id",
@@ -38,6 +32,7 @@ export default defineEventHandler(async (event) => {
       .orderBy("Submissions.created_on asc")
       .where("Submissions.correct", "=", true)
       .where("Submissions.question_id", "=", parseInt(question_id))
+      .$if(tid !== null, (query) => query.where("Questions.tournament_id", "=", tid))
       .execute(),
   ])
 

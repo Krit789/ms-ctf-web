@@ -8,8 +8,7 @@ const question_id = route.params.qid
 const question = ref()
 const questionSubmission = ref()
 const isQuestionLoading = ref(true)
-
-
+const t_id = route.params.tid
 
 const fetchQuestion = () => {
   $fetch<{
@@ -29,11 +28,17 @@ const fetchQuestion = () => {
   }>(`/api/flag/submitted/${question_id}`, {
     headers: {
       Authorization: `Bearer ${cookieToken.value}`
+    },
+    params: {
+      tid: t_id
     }
   }).then((res) => {
     question.value = res.question
     questionSubmission.value = res.submissions
-  }).finally(() => {
+  }).catch((err) => {
+    navigateTo(`/tournaments/${t_id}`, { replace: true })
+  })
+  .finally(() => {
     isQuestionLoading.value = false
   })
 }
@@ -73,7 +78,7 @@ fetchQuestion()
         <TableRow v-for="(submission, indx) in questionSubmission">
           <TableCell>{{ indx + 1 }}</TableCell>
           <TableCell>
-            <NuxtLink :to="`/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
+            <NuxtLink :to="`/tournaments/${t_id}/profile/${submission.student_id}`" class="underline hover:text-cyan-600 transition-all">
               {{ submission.student_id }}</NuxtLink>
           </TableCell>
           <TableCell>{{ submission.firstname }}</TableCell>

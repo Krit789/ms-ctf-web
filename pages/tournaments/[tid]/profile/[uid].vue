@@ -29,8 +29,7 @@ const fetchStudent = async () => {
       studentSubmission.value = res.submissions;
     })
     .catch((err) => {
-      console.error(err);
-      navigateTo('/leaderboard', { replace: true });
+      navigateTo(`/tournaments/${t_id}`, { replace: true })
     }).finally(() => {
       isProfileLoading.value = false
     });
@@ -76,12 +75,12 @@ fetchUserRank()
         <div class="font-bold text-5xl">{{ studentUser?.student_id }}
         </div>
         <div class="text-4xl mt-2" v-if="isProfileLoading">
-          <Skeleton class="w-56 h-12 rounded-full"  />
+          <Skeleton class="w-56 h-12 rounded-full" />
         </div>
         <div class="text-4xl mt-2" v-else>{{ studentUser?.firstname }} {{ studentUser?.lastname }}</div>
         <div class="flex flex-row gap-x-4 mt-2" v-if="isProfileLoading">
-          <Skeleton class="w-32 h-8 rounded-full"  />
-          <Skeleton class="w-48 h-8 rounded-full"  />
+          <Skeleton class="w-32 h-8 rounded-full" />
+          <Skeleton class="w-48 h-8 rounded-full" />
         </div>
       </div>
       <div class="flex gap-x-4">
@@ -110,14 +109,18 @@ fetchUserRank()
         <TableRow v-for="(submission, indx) in studentSubmission">
           <TableCell>{{ indx + 1 }}</TableCell>
           <TableCell>
-            <NuxtLink :to="`/question/${submission.question_id}`" class="underline hover:text-cyan-600 transition-all">
+            <NuxtLink :to="`/tournaments/${t_id}/question/${submission.question_id}`"
+              class="underline hover:text-cyan-600 transition-all">
               {{ submission.question_title }}</NuxtLink>
           </TableCell>
           <TableCell>
             <span class="flex gap-x-2">
-            {{ submission.points_with_bonus }}
-            <span class="text-xs grid place-items-center px-2 text-white bg-red-400 rounded-full" v-if="submission.points_with_bonus - (submission.base_points ?? 0) !== 0">{{ submission.points_with_bonus - (submission.base_points ?? 0) }}</span>
-          </span></TableCell>
+              {{ submission.points_with_bonus }}
+              <span class="text-xs grid place-items-center px-2 text-white bg-red-400 rounded-full"
+                v-if="submission.points_with_bonus - (submission.base_points ?? 0) !== 0">{{
+                  submission.points_with_bonus - (submission.base_points ?? 0) }}</span>
+            </span>
+          </TableCell>
           <TableCell>{{ new Date(submission.created_on).toLocaleString('th', {
             dateStyle: 'short',
             timeStyle: 'medium'
